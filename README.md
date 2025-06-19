@@ -1,10 +1,39 @@
-# 🚀 FinanceGPT - Modern AI-Powered Financial Analysis Platform
+# 🚀 Smart Invest AI - Modern AI-Powered Financial Analysis Platform
 
 <div align="center">
 
-![FinanceGPT Logo](https://img.shields.io/badge/FinanceGPT-AI%20Powered-blue?style=for-the-badge&logo=react)
+![Smart Invest AI Logo](https://img.shields.io/badge/Smart%20Invest%20AI-AI%20Powered-blue?style=for-the-badge&logo=react)
 
 **A cutting-edge financial analysis platform combining real-time market data, AI sentiment analysis, and comprehensive fundamental insights**
+
+## 🏆 Hackathon Achievement
+
+**Winner at GitHub Hack Night - June 18, 2025 🎉**
+
+<div align="center">
+
+![Hackathon Winner](https://img.shields.io/badge/🏆%20Winner-GitHub%20Hack%20Night-gold?style=for-the-badge)
+![Daft Prize](https://img.shields.io/badge/🥇%20Daft-$50%20Top%20Prize-success?style=flat-square)
+![FriendliAI Prize](https://img.shields.io/badge/🥇%20FriendliAI-$50%20Best%20Use%20Prize-success?style=flat-square)
+
+</div>
+
+Smart Invest AI was recognized as a **winning project** at the prestigious **GitHub Hack Night** hosted at the GitHub San Francisco office. The project earned **two top prizes**:
+
+- 🏅 **$50 Daft Top Prize** - For exceptional use of Daft's advanced data processing capabilities in financial analysis
+- 🏅 **$50 FriendliAI Best Use Prize** - For innovative integration of FriendliAI's LLM for sentiment analysis
+
+### 🎤 Event Highlights
+The hackathon featured lightning talks and insights from leading AI companies:
+- **Weaviate** - Vector database solutions
+- **FriendliAI** - LLM model deployment and optimization
+- **Arize AI** - ML observability and monitoring
+- **Hypermode** - AI infrastructure platform
+- **Daft by Eventual** - Next-generation data processing
+
+*Thank you to all the sponsors and organizers for an incredible event that showcased the power of modern AI technologies!*
+
+---
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.3.4-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Latest-green?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)

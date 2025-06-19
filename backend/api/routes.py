@@ -23,7 +23,7 @@ router = APIRouter()
 async def root():
     """Root endpoint"""
     return {
-        "message": "FinanceGPT API",
+        "message": "SmartInvest.ai API",
         "version": "1.0.0",
         "timestamp": datetime.now(),
         "features": [

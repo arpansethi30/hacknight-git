@@ -6,7 +6,7 @@ FRIENDLI_API_KEY=your_friendli_api_key_here
 WEAVIATE_API_KEY=your_weaviate_api_key_here
 
 # App Settings
-APP_NAME=FinanceGPT
+APP_NAME=SmartInvest.ai
 DEBUG=True
 PORT=8000
 

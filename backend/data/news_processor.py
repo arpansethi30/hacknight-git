@@ -27,8 +27,9 @@ class NewsDataProcessor:
             to_date = datetime.now()
             from_date = to_date - timedelta(days=days)
             
-            # Build search query
-            query = f"{symbol} OR {self._get_company_name(symbol)}"
+            # Build search query - broader for better coverage
+            company_name = self._get_company_name(symbol)
+            query = f'"{symbol}" OR "{company_name}"'
             
             params = {
                 "q": query,
@@ -82,17 +83,26 @@ class NewsDataProcessor:
     def _parse_articles(self, articles: List[dict], symbol: str) -> List[NewsArticle]:
         """Parse raw articles into NewsArticle objects"""
         parsed_articles = []
+        company_name = self._get_company_name(symbol)
         
         for article in articles:
             try:
+                title = article.get("title", "")
+                description = article.get("description", "")
+                content = article.get("content", "")
+                
+                # Filter articles to ensure relevance to the stock (temporarily relaxed)
+                # if not self._is_stock_relevant(title, description, content, symbol, company_name):
+                #     continue
+                
                 # Parse published date
                 published_str = article.get("publishedAt", "")
                 published_at = datetime.fromisoformat(published_str.replace("Z", "+00:00"))
                 
                 news_article = NewsArticle(
-                    title=article.get("title", ""),
-                    description=article.get("description", ""),
-                    content=article.get("content", ""),
+                    title=title,
+                    description=description,
+                    content=content,
                     url=article.get("url", ""),
                     source=article.get("source", {}).get("name", "Unknown"),
                     published_at=published_at,
@@ -107,18 +117,70 @@ class NewsDataProcessor:
         
         return parsed_articles
     
+    def _is_stock_relevant(self, title: str, description: str, content: str, symbol: str, company_name: str) -> bool:
+        """Check if article is relevant to the stock"""
+        # Combine all text for checking
+        full_text = f"{title} {description} {content}".lower()
+        
+        # Check if the stock symbol or company name appears
+        symbol_lower = symbol.lower()
+        company_lower = company_name.lower()
+        
+        # Must contain either symbol or company name (be more flexible)
+        has_symbol = symbol_lower in full_text
+        has_company = any(word in full_text for word in company_lower.split() if len(word) > 2)
+        
+        # More inclusive financial/business keywords
+        financial_keywords = [
+            'stock', 'share', 'earnings', 'revenue', 'profit', 'market', 
+            'dividend', 'price', 'trading', 'investor', 'financial', 'quarterly',
+            'annual', 'guidance', 'outlook', 'analyst', 'rating', 'buy', 'sell',
+            'business', 'company', 'corporation', 'inc', 'technology', 'tech',
+            'growth', 'performance', 'report', 'results', 'forecast', 'news'
+        ]
+        
+        has_financial_context = any(keyword in full_text for keyword in financial_keywords)
+        
+        # If it has symbol or company name, it's likely relevant
+        # Or if it has financial context and mentions the symbol/company
+        return (has_symbol or has_company) or (has_financial_context and (has_symbol or has_company))
+    
     def _get_company_name(self, symbol: str) -> str:
         """Get company name for better search results"""
-        # Simple mapping for common stocks
+        # Comprehensive mapping for common stocks
         company_names = {
             "AAPL": "Apple Inc",
             "GOOGL": "Google Alphabet",
-            "MSFT": "Microsoft",
-            "AMZN": "Amazon",
-            "TSLA": "Tesla",
-            "META": "Meta Facebook",
-            "NVDA": "NVIDIA",
-            "NFLX": "Netflix"
+            "GOOG": "Google Alphabet", 
+            "MSFT": "Microsoft Corporation",
+            "AMZN": "Amazon.com",
+            "TSLA": "Tesla Inc",
+            "META": "Meta Platforms Facebook",
+            "NVDA": "NVIDIA Corporation",
+            "NFLX": "Netflix Inc",
+            "AMD": "Advanced Micro Devices",
+            "INTC": "Intel Corporation",
+            "CRM": "Salesforce",
+            "ORCL": "Oracle Corporation",
+            "ADBE": "Adobe Inc",
+            "BABA": "Alibaba Group",
+            "JPM": "JPMorgan Chase",
+            "BAC": "Bank of America",
+            "WMT": "Walmart Inc",
+            "V": "Visa Inc",
+            "MA": "Mastercard Inc",
+            "UNH": "UnitedHealth Group",
+            "HD": "Home Depot",
+            "PG": "Procter Gamble",
+            "JNJ": "Johnson Johnson",
+            "XOM": "ExxonMobil Corporation",
+            "CVX": "Chevron Corporation",
+            "PFE": "Pfizer Inc",
+            "KO": "Coca-Cola Company",
+            "PEP": "PepsiCo Inc",
+            "COST": "Costco Wholesale",
+            "AVGO": "Broadcom Inc",
+            "ASML": "ASML Holding"
         }
         return company_names.get(symbol.upper(), symbol)
     

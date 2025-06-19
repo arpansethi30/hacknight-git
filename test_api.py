@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Quick test script for FinanceGPT API
+Quick test script for SmartInvest.ai API
 """
 import sys
 sys.path.append('.')

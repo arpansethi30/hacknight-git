@@ -2,6 +2,16 @@
 
 import { useState, useEffect } from 'react';
 
+interface NewsArticle {
+  title: string;
+  description: string;
+  content: string;
+  url: string;
+  source: string;
+  published_at: string;
+  sentiment_score: number;
+}
+
 interface AnalysisData {
   symbol: string;
   sentiment: {
@@ -24,6 +34,7 @@ interface AnalysisData {
     confidence: number;
     reasoning: string[];
   };
+  news_articles: NewsArticle[];
 }
 
 export default function StockAnalysis({ symbol = "AAPL" }) {
@@ -32,13 +43,49 @@ export default function StockAnalysis({ symbol = "AAPL" }) {
 
   useEffect(() => {
     const fetchAnalysis = async () => {
+      setLoading(true); // Reset loading state when symbol changes
       try {
+        console.log(`Fetching analysis for symbol: ${symbol}`);
         // Fetch comprehensive analysis
         const response = await fetch(`http://localhost:8001/api/v1/analysis/complete/${symbol}`);
+        console.log(`Response status: ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
-        setAnalysisData(data);
+        console.log('Raw backend data:', data);
+        
+        // Transform the backend data to match our interface
+        const transformedData = {
+          symbol: data.symbol,
+          sentiment: {
+            overall_sentiment: data.complete_analysis.sentiment_analysis.overall_sentiment,
+            positive_count: data.complete_analysis.sentiment_analysis.positive_count,
+            negative_count: data.complete_analysis.sentiment_analysis.negative_count,
+            neutral_count: data.complete_analysis.sentiment_analysis.neutral_count,
+            confidence: data.complete_analysis.recommendation.confidence_score || 0.85
+          },
+          fundamentals: {
+            pe_ratio: data.complete_analysis.fundamental_analysis.fundamental_metrics.trailing_pe,
+            pb_ratio: data.complete_analysis.fundamental_analysis.fundamental_metrics.price_to_book,
+            roe: data.complete_analysis.fundamental_analysis.fundamental_metrics.return_on_equity * 100,
+            market_cap: data.complete_analysis.fundamental_analysis.fundamental_metrics.market_cap,
+            rsi: data.complete_analysis.fundamental_analysis.technical_indicators.momentum_indicators.RSI,
+            volatility: data.complete_analysis.fundamental_analysis.risk_metrics.volatility * 100
+          },
+          recommendation: {
+            action: data.complete_analysis.recommendation.action,
+            confidence: data.complete_analysis.recommendation.confidence_score * 100,
+            reasoning: data.complete_analysis.recommendation.supporting_factors
+          },
+          news_articles: data.complete_analysis.sentiment_analysis.news_articles || []
+        };
+        
+        console.log('Transformed data:', transformedData);
+        setAnalysisData(transformedData);
       } catch (error) {
         console.error('Error fetching analysis:', error);
+        console.error('Error details:', error.message);
         // Mock data for demo
         setAnalysisData({
           symbol: symbol,
@@ -65,7 +112,8 @@ export default function StockAnalysis({ symbol = "AAPL" }) {
               "Positive sentiment trend in recent news",
               "Technical indicators showing oversold condition"
             ]
-          }
+          },
+          news_articles: []
         });
       } finally {
         setLoading(false);
@@ -78,14 +126,42 @@ export default function StockAnalysis({ symbol = "AAPL" }) {
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
+        {/* Header Loading */}
+        <div className="mb-8 text-center">
+          <div className="h-8 bg-gray-200 rounded mx-auto mb-2 w-64 animate-pulse"></div>
+          <div className="h-4 bg-gray-200 rounded mx-auto w-96 animate-pulse"></div>
+        </div>
+
+        {/* Main Grid Loading */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 animate-pulse">
               <div className="h-6 bg-gray-200 rounded mb-4"></div>
               <div className="h-4 bg-gray-200 rounded mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+              <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
             </div>
           ))}
+        </div>
+
+        {/* Technical Chart Loading */}
+        <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 mb-8 animate-pulse">
+          <div className="h-6 bg-gray-200 rounded mb-6 w-48"></div>
+          <div className="h-64 bg-gray-200 rounded-xl"></div>
+        </div>
+
+        {/* News Section Loading */}
+        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 animate-pulse">
+          <div className="h-6 bg-gray-200 rounded mb-6 w-64"></div>
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="border border-gray-200 rounded-lg p-4">
+                <div className="h-5 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded mb-2 w-3/4"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -275,6 +351,106 @@ export default function StockAnalysis({ symbol = "AAPL" }) {
               Real-time price action and technical indicators
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* News Summary Section */}
+      <div className="mt-8 bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-semibold text-gray-800">News & Sentiment Analysis</h3>
+          <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Sentiment Summary */}
+        <div className="mb-6 p-4 bg-gray-50 rounded-xl">
+          <h4 className="text-lg font-semibold text-gray-800 mb-3">How We Calculated Sentiment</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600 mb-2">
+                Our AI analyzed <strong>{analysisData.news_articles.length}</strong> recent news articles about {analysisData.symbol}:
+              </p>
+              <div className="flex items-center space-x-4 text-sm">
+                <span className="flex items-center text-green-600">
+                  <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                  {analysisData.sentiment.positive_count} Positive
+                </span>
+                <span className="flex items-center text-gray-600">
+                  <div className="w-3 h-3 bg-gray-500 rounded-full mr-2"></div>
+                  {analysisData.sentiment.neutral_count} Neutral
+                </span>
+                <span className="flex items-center text-red-600">
+                  <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                  {analysisData.sentiment.negative_count} Negative
+                </span>
+              </div>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 mb-2">Overall Sentiment Score:</p>
+              <div className="flex items-center">
+                <div className={`px-3 py-1 rounded-full text-sm font-medium ${getSentimentColor(analysisData.sentiment.overall_sentiment)}`}>
+                  {getSentimentLabel(analysisData.sentiment.overall_sentiment)} ({analysisData.sentiment.overall_sentiment.toFixed(3)})
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* News Articles */}
+        <div>
+          <h4 className="text-lg font-semibold text-gray-800 mb-4">Recent News Articles</h4>
+          {analysisData.news_articles.length > 0 ? (
+            <div className="space-y-4">
+              {analysisData.news_articles.slice(0, 5).map((article, index) => (
+                <div key={index} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h5 className="font-semibold text-gray-800 mb-2 line-clamp-2">{article.title}</h5>
+                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">{article.description}</p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3 text-xs text-gray-500">
+                          <span>{article.source}</span>
+                          <span>•</span>
+                          <span>{new Date(article.published_at).toLocaleDateString()}</span>
+                        </div>
+                        <a 
+                          href={article.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 text-xs font-medium"
+                        >
+                          Read More →
+                        </a>
+                      </div>
+                    </div>
+                    <div className="ml-4 flex flex-col items-center">
+                      <div className={`px-2 py-1 rounded text-xs font-medium ${
+                        article.sentiment_score > 0.1 ? 'bg-green-100 text-green-700' :
+                        article.sentiment_score < -0.1 ? 'bg-red-100 text-red-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {article.sentiment_score > 0.1 ? 'Positive' :
+                         article.sentiment_score < -0.1 ? 'Negative' : 'Neutral'}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {article.sentiment_score.toFixed(2)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <svg className="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+              </svg>
+              <p>No news articles available for analysis</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

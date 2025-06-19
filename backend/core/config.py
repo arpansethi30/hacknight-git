@@ -4,7 +4,7 @@ from typing import Optional
 
 class Settings(BaseSettings):
     # App Settings
-    app_name: str = "FinanceGPT"
+    app_name: str = "SmartInvest.ai"
     debug: bool = True
     port: int = 8000
     

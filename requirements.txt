@@ -1,0 +1,32 @@
+# Web Framework
+fastapi
+uvicorn
+python-multipart
+
+# Data Processing & Analysis
+daft
+pandas
+numpy
+yfinance
+
+# AI & ML
+friendli-client
+openai
+arize
+arize-phoenix
+
+# Vector Database
+weaviate-client
+
+# HTTP Requests
+requests
+httpx
+
+# Environment & Config
+python-dotenv
+pydantic
+pydantic-settings
+
+# Development
+pytest
+black

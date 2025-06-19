@@ -1,0 +1,138 @@
+# === Node.js / Next.js ===
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+.npm/
+.cache/
+.vscode/
+
+# Next.js build and deployment
+.vercel/
+turbo/
+*.log
+*.tsbuildinfo
+
+# Lock files (choose one if using)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# === Python ===
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environments
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+.Python
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Pipenv
+Pipfile.lock
+
+# Poetry
+poetry.lock
+
+# pytest
+.cache/
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# pyenv
+.python-version
+
+# Pyright
+pyrightconfig.json
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VSCode
+.vscode/
+
+# SQLite or local databases
+*.sqlite3
+*.db
+
+# Logs and local run
+*.log
+*.pid
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# === Docker ===
+Dockerfile
+.dockerignore
+docker-compose.yml
+*.tar
+*.img
+*.container
+*.dockerenv
+
+# === Mac / Linux / Windows ===
+.DS_Store
+*.swp
+*.swo
+*.swn
+Thumbs.db
+ehthumbs.db
+Icon?
+desktop.ini
+
+# === Other IDEs ===
+.idea/
+*.iml
+
+# === Optional ===
+# Remove if you want to keep lockfiles, debugger configs, etc.
+pip-log.txt
+pip-delete-this-directory.txt
